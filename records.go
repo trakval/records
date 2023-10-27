@@ -8,5 +8,5 @@ type Records interface {
 	UpdateRecord(string, map[string]interface{}) (string, error)
 	DeleteRecord(string) (string, error)
 
-	FetchRecord(string) (string, map[string]interface{}, error)
+	ReadRecord(string) (string, map[string]interface{}, error)
 }

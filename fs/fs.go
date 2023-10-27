@@ -76,7 +76,7 @@ func (fsr FsRecords) DeleteRecord(key string) (string, error) {
 	return key, os.Remove(fsr.getFilePath(key))
 }
 
-func (fsr FsRecords) FetchRecord(key string) (string, map[string]interface{}, error) {
+func (fsr FsRecords) ReadRecord(key string) (string, map[string]interface{}, error) {
 	file, err := os.Open(fsr.getFilePath(key))
 	if err != nil {
 		return key, nil, err

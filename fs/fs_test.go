@@ -41,10 +41,10 @@ func TestCreate(t *testing.T) {
 	if err != nil {
 		t.Errorf("error checking created file: %v", err)
 	}
-	t.Logf("FileInfo: %v", fi)
+	t.Logf("FileInfo: %s (%d B)", fi.Name(), fi.Size())
 }
 
-func TestFetch(t *testing.T) {
+func TestRead(t *testing.T) {
 	key := "2"
 	frontmatter := map[string]interface{}{
 		"k1": "v1",
@@ -59,7 +59,7 @@ func TestFetch(t *testing.T) {
 		t.Errorf("error on create: %v", err)
 	}
 
-	rk, fr, err := r.FetchRecord(key)
+	rk, fr, err := r.ReadRecord(key)
 	if err != nil {
 		t.Errorf("error on fetch: %v", err)
 	}
@@ -100,7 +100,7 @@ func TestUpdate(t *testing.T) {
 		t.Errorf("error on create: %v", err)
 	}
 
-	rk, fr, err := r.FetchRecord(key)
+	rk, fr, err := r.ReadRecord(key)
 	if err != nil {
 		t.Errorf("error on fetch: %v", err)
 	}
@@ -126,7 +126,7 @@ func TestUpdate(t *testing.T) {
 		t.Errorf("error on update: %v", err)
 	}
 
-	rk, fr, err = r.FetchRecord(key)
+	rk, fr, err = r.ReadRecord(key)
 	if err != nil {
 		t.Errorf("error on fetch(after update): %v", err)
 	}
