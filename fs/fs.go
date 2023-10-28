@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sort"
+	"strings"
 
 	"github.com/gernest/front"
 	"gopkg.in/yaml.v2"
@@ -94,4 +96,26 @@ func (fsr FsRecords) ReadRecord(key string) (string, map[string]interface{}, err
 	record["body"] = body
 
 	return key, record, nil
+}
+
+func (fsr FsRecords) GetRecordKeys() ([]string, error) {
+	var keys []string
+
+	v, err := os.Open(fsr.getVaultDirPath())
+	if err != nil {
+		return keys, nil
+	}
+	files, err := v.ReadDir(0)
+	if err != nil {
+		return keys, nil
+	}
+
+	for _, f := range files {
+		if f.Type().IsRegular() && strings.HasSuffix(f.Name(), ".md") {
+			t := strings.Split(f.Name(), ".")
+			keys = append(keys, t[0])
+		}
+	}
+	sort.Sort(sort.Reverse(sort.StringSlice(keys)))
+	return keys, nil
 }

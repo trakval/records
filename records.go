@@ -9,4 +9,6 @@ type Records interface {
 	DeleteRecord(string) (string, error)
 
 	ReadRecord(string) (string, map[string]interface{}, error)
+
+	GetRecordKeys() ([]string, error)
 }

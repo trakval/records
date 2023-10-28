@@ -20,8 +20,7 @@ func TestMain(m *testing.M) {
 	os.Exit(c)
 }
 
-func TestCreate(t *testing.T) {
-	key := "1"
+func createRecord(t *testing.T, key string) {
 	frontmatter := map[string]interface{}{
 		"k1": "v1",
 		"k2": "v2",
@@ -37,6 +36,11 @@ func TestCreate(t *testing.T) {
 	if rk != key {
 		t.Errorf("error on returned key!")
 	}
+}
+
+func TestCreate(t *testing.T) {
+	key := "1"
+	createRecord(t, key)
 	fi, err := os.Stat(fmt.Sprintf("/tmp/fs_records/vault/%s.md", key))
 	if err != nil {
 		t.Errorf("error checking created file: %v", err)
@@ -46,19 +50,7 @@ func TestCreate(t *testing.T) {
 
 func TestRead(t *testing.T) {
 	key := "2"
-	frontmatter := map[string]interface{}{
-		"k1": "v1",
-		"k2": "v2",
-	}
-	record := map[string]interface{}{
-		"frontmatter": frontmatter,
-		"body":        "test",
-	}
-	_, err := r.CreateRecord(key, record)
-	if err != nil {
-		t.Errorf("error on create: %v", err)
-	}
-
+	createRecord(t, key)
 	rk, fr, err := r.ReadRecord(key)
 	if err != nil {
 		t.Errorf("error on fetch: %v", err)
@@ -87,19 +79,7 @@ func TestRead(t *testing.T) {
 
 func TestUpdate(t *testing.T) {
 	key := "3"
-	frontmatter := map[string]interface{}{
-		"k1": "v1",
-		"k2": "v2",
-	}
-	record := map[string]interface{}{
-		"frontmatter": frontmatter,
-		"body":        "test",
-	}
-	_, err := r.CreateRecord(key, record)
-	if err != nil {
-		t.Errorf("error on create: %v", err)
-	}
-
+	createRecord(t, key)
 	rk, fr, err := r.ReadRecord(key)
 	if err != nil {
 		t.Errorf("error on fetch: %v", err)
@@ -118,6 +98,7 @@ func TestUpdate(t *testing.T) {
 
 	fm["k1"] = "v3"
 	fm["k2"] = "v4"
+	record := map[string]interface{}{}
 	record["frontmatter"] = fm
 	record["body"] = "test-update"
 
@@ -154,22 +135,8 @@ func TestUpdate(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	key := "4"
-	frontmatter := map[string]interface{}{
-		"k1": "v1",
-		"k2": "v2",
-	}
-	record := map[string]interface{}{
-		"frontmatter": frontmatter,
-		"body":        "test",
-	}
-	rk, err := r.CreateRecord(key, record)
-	if err != nil {
-		t.Errorf("error on create: %v", err)
-	}
-	if rk != key {
-		t.Errorf("error on returned key!")
-	}
-	rk, err = r.DeleteRecord(key)
+	createRecord(t, key)
+	rk, err := r.DeleteRecord(key)
 	if err != nil {
 		t.Errorf("error on delete: %v", err)
 	}
@@ -180,4 +147,32 @@ func TestDelete(t *testing.T) {
 	if !errors.Is(err, os.ErrNotExist) {
 		t.Errorf("error on delete: %v", err)
 	}
+}
+
+func TestGetRecordKeys(t *testing.T) {
+	keys := []string{"4", "5"}
+	for _, key := range keys {
+		createRecord(t, key)
+	}
+
+	rks, err := r.GetRecordKeys()
+	if err != nil {
+		t.Errorf("error on get-record-keys: %v", err)
+	}
+
+	for _, key := range keys {
+		if !(contains(rks, key)) {
+			t.Errorf("created record not found in get-record-keys result")
+		}
+	}
+	t.Logf("returned keys: %v", rks)
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
